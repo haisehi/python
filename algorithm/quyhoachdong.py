@@ -1,7 +1,3 @@
-def print_matrix(matrix):
-    for row in matrix:
-        print(" ".join(map(str, row)))
-
 def longest_common_subsequence(X, Y):
     m = len(X)
     n = len(Y)
@@ -16,10 +12,6 @@ def longest_common_subsequence(X, Y):
             else:
                 dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
 
-    # In ra ma trận dp
-    print("   ", " ".join(Y))
-    print_matrix([[" "] + [char for char in Y]] + [[X[i - 1]] + row[1:] for i, row in enumerate(dp)])
-    
     # Truy vết để tìm dãy con chung
     lcs_length = dp[m][n]
     lcs = [''] * lcs_length
@@ -31,16 +23,20 @@ def longest_common_subsequence(X, Y):
             i -= 1
             j -= 1
             lcs_length -= 1
-        elif dp[i - 1][j] > dp[i][j - 1]:  # Cập nhật điều kiện
+        elif dp[i - 1][j] > dp[i][j - 1]:
             i -= 1
         else:
             j -= 1
 
-    return ''.join(lcs[::-1])  # Lật ngược dãy để đảm bảo đúng thứ tự
+    return ''.join(lcs)
 
 # Ví dụ
-X = "ABCBDAB"
-Y = "BDCABA"
+#X = "ABCB DAB"
+#Y = "BDCAB A"
+print("Nhập chuỗi 1")
+X = input()
+print("nhập chuỗi 2")
+Y = input()
 print("Chuỗi X:", X)
 print("Chuỗi Y:", Y)
 print("Dãy con chung dài nhất:", longest_common_subsequence(X, Y))
