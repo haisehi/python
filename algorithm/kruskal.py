@@ -15,15 +15,16 @@ class Graph:
     def kruskal_algo(self):
         T = []
         total_length = 0
-        parent = [-1] * self.V  # Initialize parent array for union-find
+        parent = [-1] * self.V  # Khởi tạo mảng cha để tìm liên kết
+        
 
-        # Utility function to find set of an element (uses path compression)
+        # Hàm tiện ích để tìm tập hợp phần tử (sử dụng tính năng nén đường dẫn)
         def find(parent, i):
             if parent[i] == -1:
                 return i
             return find(parent, parent[i])
 
-        # Utility function to perform union of two sets (uses union by rank)
+        # Hàm tiện ích để thực hiện hợp nhất hai bộ (sử dụng hợp theo hạng)
         def union(parent, x, y):
             xroot = find(parent, x)
             yroot = find(parent, y)
@@ -32,7 +33,7 @@ class Graph:
         step = 1
         while len(T) < self.V - 1 and self.E:
             print(f"ITIE={step}<= {self.V} và E<> Ø\n")
-            print(f"E = E\{self.E[0]} = {self.E}")
+            print(f"E = E\{self.E[0]} = {[(e[0], e[1], self.weights[i]) for i, e in enumerate(self.E)]}")
             edge = self.E.pop(0)
             weight = self.weights.pop(0)
             x = find(parent, edge[0] - 1)
