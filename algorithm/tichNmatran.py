@@ -1,67 +1,87 @@
-def matrix_multiply(A, B):
-    if len(A[0]) != len(B):
-        return "Không thể nhân hai ma trận này"
+import sys
 
-    result = [[0 for _ in range(len(B[0]))] for _ in range(len(A))]
+# Hàm tính toán và trả về số lượng phép toán nhân tối thiểu cần thiết để nhân dãy ma trận
+def minMatrixMultiplications(dims, bracket, dp):
+    n = len(dims) - 1  # Số lượng ma trận
 
-    for i in range(len(A)):
-        for j in range(len(B[0])):
-            for k in range(len(B)):
-                result[i][j] += A[i][k] * B[k][j]
+    # Duyệt qua độ dài của dãy ma trận từ 2 đến n
+    for length in range(2, n + 1):
+        # Duyệt qua từng đoạn con có độ dài length trong dãy ma trận
+        for i in range(1, n - length + 2):
+            print(f"Với d = {length - 1}, ", end="")
+            j = i + length - 1
+            dp[i][j] = sys.maxsize
+            print(f"F[{i}, {j}] = min(", end="")
+            # Duyệt qua từng điểm cắt k để tìm phép nhân tối thiểu
+            tam = []
+            for k in range(i, j):
+                # Tính số phép toán nhân cho phép nhân 2 dãy con
+                cost = dp[i][k] + dp[k + 1][j] + dims[i - 1] * dims[k] * dims[j]
+                tam.append(cost)
+                print(f"F[{i}, {k}] + F[{k + 1}, {j}] + {dims[i - 1]} * {dims[k]} * {dims[j]}", end="")
+                if k != j - 1:
+                    print(", ", end="\n")
+                else:
+                    print(")", end="")
+                # Cập nhật số phép toán nhân tối thiểu
+                if cost < dp[i][j]:
+                    dp[i][j] = cost
+                    bracket[i][j] = k  # Lưu vị trí của phép nhân tối ưu
+            print(" = min(", end="")
+            for idx, val in enumerate(tam):
+                if idx == len(tam) - 1:
+                    print(val, end="")
+                else:
+                    print(f"{val}, ", end="")
+            print(f") = {dp[i][j]}\n")
+    # Trả về số lượng phép toán nhân tối thiểu cần thiết
+    return dp[1][n]
 
-    return result
+# Hàm in ra cách nhóm ma trận tối ưu
+def printOptimalParenthesis(bracket, dims, i, j):
+    if i == j:
+        print(dims[i - 1], end="")
+    else:
+        print("(", end="")
+        printOptimalParenthesis(bracket, dims, i, bracket[i][j])
+        print(", ", end="")
+        printOptimalParenthesis(bracket, dims, bracket[i][j] + 1, j)
+        print(")", end="")
 
-def input_matrix(size):
-    matrix = []
-    print(f"Nhập ma trận {size}:")
-    for i in range(size[0]):
-        row = list(map(int, input(f"Nhập hàng {i + 1} (các số cách nhau bằng dấu cách): ").split()))
-        matrix.append(row)
-    return matrix
+# Hàm in ra mảng số lượng phép toán tối thiểu
+def printMinimumOperations(dp):
+    n = len(dp) - 1
+    print("Số lượng phép toán nhân tối thiểu cho các đoạn con:")
+    for i in range(1, n + 1):
+        for j in range(1, n + 1):
+            if i <= j:
+                print(dp[i][j], end="\t")
+            else:
+                print("0", end="\t")
+        print()
 
-def dynamic_matrix_multiply(matrices, print_steps=True):
-    n = len(matrices)
-    if n <= 1:
-        return matrices[0]
+def printBracketMatrix(bracket, n):
+    print("Ma trận bracket:")
+    for i in range(1, n + 1):
+        for j in range(1, n + 1):
+            print(bracket[i][j], end="\t")
+        print()
 
-    result = matrices[0]
-    for i in range(1, n):
-        if print_steps:
-            print(f"Bước {i}:")
-            print("Ma trận trước khi nhân:")
-            for row in result:
-                print(row)
-            print("Ma trận tiếp theo:")
-            for row in matrices[i]:
-                print(row)
-        result = matrix_multiply(result, matrices[i])
-        if print_steps:
-            print("Kết quả sau khi nhân:")
-            for row in result:
-                print(row)
-            print()
+def main():
+    dims = [20, 2, 30, 12, 8]  # Kích thước của các ma trận
+    n = len(dims) - 1  # Số lượng ma trận
+    bracket = [[0] * (n + 1) for _ in range(n + 1)]
+    dp = [[0] * (n + 1) for _ in range(n + 1)]
 
-    return result
+    minOperations = minMatrixMultiplications(dims, bracket, dp)
+    print("Số lượng phép toán nhân tối thiểu:", minOperations)
 
-num_matrices = int(input("Nhập số ma trận cần tính tích: "))
+    printMinimumOperations(dp)
+    printBracketMatrix(bracket, n)
 
-# Nhập kích thước của mỗi ma trận
-sizes = []
-for i in range(num_matrices):
-    rows = int(input(f"Nhập số hàng của ma trận {i + 1}: "))
-    cols = int(input(f"Nhập số cột của ma trận {i + 1}: "))
-    sizes.append((rows, cols))
+    print("Cách nhóm ma trận tối ưu: ", end="")
+    printOptimalParenthesis(bracket, dims, 1, n)
+    print()
 
-# Nhập và tính tích của các ma trận
-matrices = []
-for i in range(num_matrices):
-    matrix = input_matrix(sizes[i])
-    matrices.append(matrix)
-
-# Tính tích của các ma trận bằng phương pháp quy hoạch động và hiển thị các bước tính
-result_matrix = dynamic_matrix_multiply(matrices)
-
-# In kết quả của tích hai ma trận
-print("Kết quả của tích các ma trận:")
-for row in result_matrix:
-    print(row)
+if __name__ == "__main__":
+    main()

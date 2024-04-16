@@ -1,3 +1,4 @@
+#đoạn code dùng để chia để trị
 def matrix_multiply(A, B):
     if len(A[0]) != len(B):
         return "Không thể nhân hai ma trận này"
