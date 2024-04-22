@@ -1,3 +1,4 @@
+#xong
 class Graph:
     def __init__(self, vertices, edges, weights):
         self.V = vertices

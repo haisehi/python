@@ -1,87 +1,85 @@
 import sys
 
-# Hàm tính toán và trả về số lượng phép toán nhân tối thiểu cần thiết để nhân dãy ma trận
-def minMatrixMultiplications(dims, bracket, dp):
-    n = len(dims) - 1  # Số lượng ma trận
-
-    # Duyệt qua độ dài của dãy ma trận từ 2 đến n
-    for length in range(2, n + 1):
-        # Duyệt qua từng đoạn con có độ dài length trong dãy ma trận
-        for i in range(1, n - length + 2):
-            print(f"Với d = {length - 1}, ", end="")
-            j = i + length - 1
-            dp[i][j] = sys.maxsize
-            print(f"F[{i}, {j}] = min(", end="")
-            # Duyệt qua từng điểm cắt k để tìm phép nhân tối thiểu
-            tam = []
+# Hàm tính toán tối ưu cho tích của bốn ma trận và hiển thị phân tích kết quả
+def optimalMatrixProduct(a, F, split, n):
+    for d in range(1, n):
+        for i in range(1, n - d + 1):
+            j = i + d
+            F[i][j] = sys.maxsize
             for k in range(i, j):
-                # Tính số phép toán nhân cho phép nhân 2 dãy con
-                cost = dp[i][k] + dp[k + 1][j] + dims[i - 1] * dims[k] * dims[j]
-                tam.append(cost)
-                print(f"F[{i}, {k}] + F[{k + 1}, {j}] + {dims[i - 1]} * {dims[k]} * {dims[j]}", end="")
-                if k != j - 1:
-                    print(", ", end="\n")
-                else:
-                    print(")", end="")
-                # Cập nhật số phép toán nhân tối thiểu
-                if cost < dp[i][j]:
-                    dp[i][j] = cost
-                    bracket[i][j] = k  # Lưu vị trí của phép nhân tối ưu
-            print(" = min(", end="")
-            for idx, val in enumerate(tam):
-                if idx == len(tam) - 1:
-                    print(val, end="")
-                else:
-                    print(f"{val}, ", end="")
-            print(f") = {dp[i][j]}\n")
-    # Trả về số lượng phép toán nhân tối thiểu cần thiết
-    return dp[1][n]
+                cost = F[i][k] + F[k + 1][j] + a[i - 1] * a[k] * a[j]
+                if cost < F[i][j]:
+                    F[i][j] = cost
+                    split[i][j] = k
 
-# Hàm in ra cách nhóm ma trận tối ưu
-def printOptimalParenthesis(bracket, dims, i, j):
-    if i == j:
-        print(dims[i - 1], end="")
-    else:
-        print("(", end="")
-        printOptimalParenthesis(bracket, dims, i, bracket[i][j])
-        print(", ", end="")
-        printOptimalParenthesis(bracket, dims, bracket[i][j] + 1, j)
-        print(")", end="")
-
-# Hàm in ra mảng số lượng phép toán tối thiểu
-def printMinimumOperations(dp):
-    n = len(dp) - 1
-    print("Số lượng phép toán nhân tối thiểu cho các đoạn con:")
-    for i in range(1, n + 1):
-        for j in range(1, n + 1):
-            if i <= j:
-                print(dp[i][j], end="\t")
+    # In phân tích kết quả
+    print(f"Ta có a = ({', '.join(map(str, a))}).")
+    for d in range(1, n):
+        print(f"Với d = {d}:")
+        for i in range(1, n - d + 1):
+            j = i + d
+            print(f"F[{i},{j}] = ", end="")
+            if d > 1:
+                print("min(", end="")
+                for k in range(i, j):
+                    print(f"F[{i},{k}] + F[{k + 1},{j}] + {a[i - 1]} x {a[k]} x {a[j]}", end="")
+                    if k != j - 1:
+                        print(", ", end="\n             ")
+                print("", end="\n       = min(")
+                for k in range(i, j):
+                    print(F[i][k] + F[k + 1][j] + a[i - 1] * a[k] * a[j], end="")
+                    if k != j - 1:
+                        print(", ", end="")
+                print(f") = {F[i][j]}")
             else:
-                print("0", end="\t")
-        print()
+                print(F[i][j])
 
-def printBracketMatrix(bracket, n):
-    print("Ma trận bracket:")
-    for i in range(1, n + 1):
-        for j in range(1, n + 1):
-            print(bracket[i][j], end="\t")
-        print()
+    return F[1][n]
 
-def main():
-    dims = [20, 2, 30, 12, 8]  # Kích thước của các ma trận
-    n = len(dims) - 1  # Số lượng ma trận
-    bracket = [[0] * (n + 1) for _ in range(n + 1)]
-    dp = [[0] * (n + 1) for _ in range(n + 1)]
+# Hàm in dấu ngoặc đúng vị trí để nhân các ma trận
+def printParenthesis(split, i, j):
+    if i == j:
+        print(f"A{i}", end="")
+        return
 
-    minOperations = minMatrixMultiplications(dims, bracket, dp)
-    print("Số lượng phép toán nhân tối thiểu:", minOperations)
+    print("(", end="")
+    printParenthesis(split, i, split[i][j])
+    printParenthesis(split, split[i][j] + 1, j)
+    print(")", end="")
 
-    printMinimumOperations(dp)
-    printBracketMatrix(bracket, n)
+a = [20, 2, 30, 12, 8]
+n = len(a) - 1
 
-    print("Cách nhóm ma trận tối ưu: ", end="")
-    printOptimalParenthesis(bracket, dims, 1, n)
+# Khởi tạo ma trận F và split
+F = [[0] * (n + 1) for _ in range(n + 1)]
+split = [[0] * (n + 1) for _ in range(n + 1)]
+
+# Gọi hàm tính toán và in ra kết quả
+minOperations = optimalMatrixProduct(a, F, split, n)
+
+# In ra các ma trận và tích của chúng
+print("Ma trận F:")
+print("    ", end="")
+for j in range(1, n + 1):
+    print(j, "  ", end="")
+print()
+for i in range(1, n + 1):
+    print(i, "|", end=" ")
+    for j in range(1, n + 1):
+        print(F[i][j], end="  ")
     print()
 
-if __name__ == "__main__":
-    main()
+print("Ma trận split:")
+print("    ", end="")
+for j in range(1, n + 1):
+    print(j, "  ", end="")
+print()
+for i in range(1, n + 1):
+    print(i, "|", end=" ")
+    for j in range(1, n + 1):
+        print(split[i][j], end="  ")
+    print()
+
+print("Phép nhân ma trận tối ưu: ", end="")
+printParenthesis(split, 1, n)
+print(" =", minOperations)

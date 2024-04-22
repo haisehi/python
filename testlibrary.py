@@ -1,60 +1,85 @@
-def partition(arr, low, high, indices):
-    i = low - 1  # chỉ số của phần tử nhỏ hơn hoặc bằng pivot
-    pivot = arr[high]  # pivot
+import sys
 
-    for j in range(low, high):
-        # Nếu phần tử hiện tại nhỏ hơn hoặc bằng pivot
-        if arr[j] <= pivot:
-            # tăng chỉ số của phần tử nhỏ hơn hoặc bằng pivot
-            i = i + 1
-            arr[i], arr[j] = arr[j], arr[i]
-            indices[i], indices[j] = indices[j], indices[i]
+# Hàm tính toán tối ưu cho tích của bốn ma trận và hiển thị phân tích kết quả
+def optimalMatrixProduct(a, F, split, n):
+    for d in range(1, n):
+        for i in range(1, n - d + 1):
+            j = i + d
+            F[i][j] = sys.maxsize
+            for k in range(i, j):
+                cost = F[i][k] + F[k + 1][j] + a[i - 1] * a[k] * a[j]
+                if cost < F[i][j]:
+                    F[i][j] = cost
+                    split[i][j] = k
 
-    arr[i + 1], arr[high] = arr[high], arr[i + 1]
-    indices[i + 1], indices[high] = indices[high], indices[i + 1]
-    return i + 1
+    # In phân tích kết quả
+    print(f"Ta có a = ({', '.join(map(str, a))}).")
+    for d in range(1, n):
+        print(f"Với d = {d}:")
+        for i in range(1, n - d + 1):
+            j = i + d
+            print(f"F[{i},{j}] = ", end="")
+            if d > 1:
+                print("min(", end="")
+                for k in range(i, j):
+                    print(f"F[{i},{k}] + F[{k + 1},{j}] + {a[i - 1]} x {a[k]} x {a[j]}", end="")
+                    if k != j - 1:
+                        print(", ", end="\n             ")
+                print("", end="\n       = min(")
+                for k in range(i, j):
+                    print(F[i][k] + F[k + 1][j] + a[i - 1] * a[k] * a[j], end="")
+                    if k != j - 1:
+                        print(", ", end="")
+                print(f") = {F[i][j]}")
+            else:
+                print(F[i][j])
 
-# hàm dùng để biểu diễn thuật toán quicksort
-def quicksort(arr, low, high, indices, level=1, print_indices=True):
-    if low < high:
-        # p là chỉ số của pivot sau khi partition
-        p = partition(arr, low, high, indices)
+    return F[1][n]
 
-        print(f"Luot {level}: p[{indices[p] + 1}] = {arr[p]}")
-        print(f"Left = {indices[p] + 2}; ", end="")
-        print(f"k = {high - low + 1}; ", end="")
-        print(f"swap(A[{indices[high] + 1}], A[{indices[p] + 1}]) = swap({arr[high]}, {arr[p]})")
-        if print_indices:
-            print("Chi so:", end=" ")
-            for idx in range(low, high + 1):
-                print(indices[idx] + 1, end=" ")
-            print("\nDay ban dau:", end=" ")
-            for idx in range(low, high + 1):
-                print(arr[idx], end=" ")
-            print()
+# Hàm in dấu ngoặc đúng vị trí để nhân các ma trận
+def printParenthesis(split, i, j):
+    if i == j:
+        print(f"A{i}", end="")
+        return
 
-        # Sắp xếp các phần tử trước và sau pivot
-        quicksort(arr, low, p - 1, indices, level + 1, False)
-        quicksort(arr, p + 1, high, indices, level + 1, False)
+    print("(", end="")
+    printParenthesis(split, i, split[i][j])
+    printParenthesis(split, split[i][j] + 1, j)
+    print(")", end="")
 
-# Nhập mảng từ người dùng
-print("Nhap mang cac so, cach nhau bang dau cach: ", end="")
-input_str = input()
-arr = list(map(int, input_str.split()))
-indices = list(range(len(arr)))
+a = [20, 2, 30, 12, 8]
+n = len(a) - 1
 
-# Sử dụng hàm quicksort để sắp xếp mảng
-print("\nDay ban dau:", end=" ")
-for i in arr:
-    print(i, end=" ")
-print("\nChi so:", end=" ")
-for i in range(1, len(arr) + 1):
-    print(i, end=" ")
-print("\n")
+# Khởi tạo ma trận F và split
+F = [[0] * (n + 1) for _ in range(n + 1)]
+split = [[0] * (n + 1) for _ in range(n + 1)]
 
-quicksort(arr, 0, len(arr) - 1, indices)
+# Gọi hàm tính toán và in ra kết quả
+minOperations = optimalMatrixProduct(a, F, split, n)
 
-# In mảng đã sắp xếp
-print("\nMang da sap xep:")
-for i in arr:
-    print(i, end=" ")
+# In ra các ma trận và tích của chúng
+print("Ma trận F:")
+print("    ", end="")
+for j in range(1, n + 1):
+    print(j, "  ", end="")
+print()
+for i in range(1, n + 1):
+    print(i, "|", end=" ")
+    for j in range(1, n + 1):
+        print(F[i][j], end="  ")
+    print()
+
+print("Ma trận split:")
+print("    ", end="")
+for j in range(1, n + 1):
+    print(j, "  ", end="")
+print()
+for i in range(1, n + 1):
+    print(i, "|", end=" ")
+    for j in range(1, n + 1):
+        print(split[i][j], end="  ")
+    print()
+
+print("Phép nhân ma trận tối ưu: ", end="")
+printParenthesis(split, 1, n)
+print(" =", minOperations)
