@@ -1,4 +1,4 @@
-#xong
+# chia de tri : quicksort
 def partition(arr, left, right):
     pivot_index = (left + right) // 2
     pivot_value = arr[pivot_index]

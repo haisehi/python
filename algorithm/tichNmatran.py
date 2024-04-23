@@ -1,3 +1,4 @@
+#quy hoach dong: nhan n ma tran
 import sys
 
 # Hàm tính toán tối ưu cho tích của bốn ma trận và hiển thị phân tích kết quả

@@ -1,3 +1,4 @@
+#quy hoach dong: tim day con chung
 def find_all_LCS(s1, s2, m, n, L):
     result = []
 
