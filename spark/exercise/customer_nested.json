@@ -1,0 +1,21 @@
+{
+    "customer": [
+        {
+            "cust_id": 123,
+            "full_name": {
+              "first_name": "John",
+              "last_name": "Doe"
+            },
+            "city": "New York"
+          },
+          {
+            "cust_id": 456,
+            "full_name": {
+              "first_name": "John",
+              "last_name": "smith"
+            },
+            "city": "California"
+          }
+
+    ]
+}
