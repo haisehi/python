@@ -1,41 +1,40 @@
-# chia de tri : quicksort
-def partition(arr, left, right):
-    pivot_index = (left + right) // 2
-    pivot_value = arr[pivot_index]
+def partition(arr, low, high):
+    i = (low - 1)
+    pivot = arr[high]
+    print("Chọn pivot:", pivot)
 
-    print("\nPivot value:", pivot_value)
-    i, j = left, right
+    for j in range(low, high):
 
-    while i <= j:
-        while arr[i] < pivot_value:
-            i += 1
-        while arr[j] > pivot_value:
-            j -= 1
-        if i <= j:
-            print(f"Swap a[{i}]({arr[i]}) a[{j}]({arr[j]}): ", end="")
+        # Nếu phần tử hiện tại nhỏ hơn pivot
+        if arr[j] < pivot:
+            i = i + 1
             arr[i], arr[j] = arr[j], arr[i]
-            print(" ".join(map(str, arr)))
-            i += 1
-            j -= 1
 
-    return i
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+    print("Mảng sau khi so sánh và sắp xếp:", arr)
+    return (i + 1)
 
-def quickSort(arr, left, right):
-    if left < right:
-        pivot_index = partition(arr, left, right)
-        print("[", end=" ")
-        for i in range(left, pivot_index):
-            print(arr[i], end=" ")
-        print("] ", end="")
-        print("[", end=" ")
-        for i in range(pivot_index, right + 1):
-            print(arr[i], end=" ")
-        print("] ")
-        quickSort(arr, left, pivot_index - 1)  # Sắp xếp nửa bên trái
-        quickSort(arr, pivot_index, right)     # Sắp xếp nửa bên phải
+def quickSort(arr, low, high):
+    if low < high:
+        pi = partition(arr, low, high)
+        print("Bước sắp xếp:", arr[low:high+1])
 
-if __name__ == "__main__":
-    arr = [42, 23, 74, 11, 65, 58, 94, 36, 99, 87]
-    print("Mảng chưa sắp xếp:", " ".join(map(str, arr)))
-    quickSort(arr, 0, len(arr) - 1)
-    print("Mảng đã sắp xếp:", " ".join(map(str, arr)))
+        # Sắp xếp các phần trước và sau phần chia
+        quickSort(arr, low, pi - 1)
+        quickSort(arr, pi + 1, high)
+
+# Mảng ban đầu
+arr = [9,-3,5,2,6,8,-6,1,3]
+n = len(arr)
+
+print("Mảng ban đầu là:")
+for i in range(n):
+    print("%d" % arr[i], end=" ")
+
+# Sắp xếp mảng
+print("\nCác bước sắp xếp:")
+quickSort(arr, 0, n - 1)
+
+print("\nMảng sau khi sắp xếp là:")
+for i in range(n):
+    print("%d" % arr[i], end=" ")

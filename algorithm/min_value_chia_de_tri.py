@@ -6,12 +6,12 @@ def max_value(arr, step=0):
     else:
         mid = len(arr) // 2
         print("Chia {}: {} | {}".format(step, arr[:mid], arr[mid:]))
-        left_max = max_value(arr[:mid], step + 1)
-        right_max = max_value(arr[mid:], step + 1)
-        print("So sánh {}: {} | {}".format(step, left_max, right_max))
-        max_val = max(left_max, right_max)                                                                                                                                                                                                  
-        print("Kết quả từ bước so sánh {}: {}".format(step, max_val))
-        return max_val
+        left_min = max_value(arr[:mid], step - 1)
+        right_min = max_value(arr[mid:], step - 1)
+        print("So sánh {}: {} | {}".format(step, left_min, right_min))
+        min_val = max(right_min,left_min)                                                                                                                                                                                                  
+        print("Kết quả từ bước so sánh {}: {}".format(step, min_val))
+        return min_val
 
 # Ví dụ sử dụng
 arr = [2, 5, 6, 4, 3, 7, 1, 9, 8]
