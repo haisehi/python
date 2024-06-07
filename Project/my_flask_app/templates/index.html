@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload CSV and Predict</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <style>
+        
+    </style>
+</head>
+<body>
+    <h1>Upload CSV and Predict</h1>
+    <form action="/predict" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".csv" required>
+        <button type="submit">Upload and Predict</button>
+    </form>
+
+    {% if raw_data %}
+        <h2>Raw Data (First 20 Rows)</h2>
+        <table>
+            <tr>
+                {% for column in raw_data[0].keys() %}
+                    <th>{{ column }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in raw_data %}
+                <tr>
+                    {% for value in row.values() %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    {% if mae %}
+        <h2>Model Evaluation Metrics</h2>
+        <div class="summary">
+            <p>Mean Absolute Error (MAE): {{ mae }}</p>
+            <p>Mean Squared Error (MSE): {{ mse }}</p>
+            <p>R-squared (R²): {{ r2 }}</p>
+        </div>
+    {% endif %}
+
+    {% if plot_url %}
+        <h2>Actual vs Predicted Revenue by Date</h2>
+        <div class="plot">
+            <img src="data:image/png;base64,{{ plot_url }}" alt="Revenue Plot">
+        </div>
+    {% endif %}
+
+    {% if region_plot_url %}
+        <h2>Actual vs Predicted Revenue by Region</h2>
+        <div class="plot">
+            <img src="data:image/png;base64,{{ region_plot_url }}" alt="Region Revenue Plot">
+        </div>
+    {% endif %}
+
+    {% if region_revenue %}
+        <h2>Revenue by Region</h2>
+        <table>
+            <tr>
+                <th>Region</th>
+                <th>Actual Revenue</th>
+                <th>Predicted Revenue</th>
+            </tr>
+            {% for row in region_revenue %}
+                <tr>
+                    <td>{{ row['Region Name'] }}</td>
+                    <td>{{ row['Actual Revenue'] }}</td>
+                    <td>{{ row['Predicted Revenue'] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    {% if category_plot_url %}
+        <h2>Actual vs Predicted Revenue by Product Category</h2>
+        <div class="plot">
+            <img src="data:image/png;base64,{{ category_plot_url }}" alt="Category Revenue Plot">
+        </div>
+    {% endif %}
+
+    {% if category_revenue %}
+        <h2>Revenue by Product Category</h2>
+        <table>
+            <tr>
+                <th>Product Category</th>
+                <th>Actual Revenue</th>
+                <th>Predicted Revenue</th>
+            </tr>
+            {% for row in category_revenue %}
+                <tr>
+                    <td>{{ row['Category Name'] }}</td>
+                    <td>{{ row['Actual Revenue'] }}</td>
+                    <td>{{ row['Predicted Revenue'] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    {% if total_actual_revenue %}
+        <div class="summary">
+            <p>Total Actual Revenue: {{ total_actual_revenue }}</p>
+            <p>Total Predicted Revenue: {{ total_predicted_revenue }}</p>
+            <p>Revenue Change: {{ revenue_change }}</p>
+            <p>Change Percentage: {{ change_percentage }}%</p>
+        </div>
+    {% endif %}
+
+    {% if predicted_data_link %}
+        <div class="download-link">
+            <a href="{{ predicted_data_link }}">Download Predicted Data</a>
+        </div>
+    {% endif %}
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+</body>
+</html>
